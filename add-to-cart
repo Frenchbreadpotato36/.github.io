@@ -8,7 +8,6 @@
   <p>Adding item to cart...</p>
   
   <script>
-    // Define your products
     const products = {
       chocolate: { name: "Chocolate Chip Cookie", price: 4.00 },
       peanutbutter: { name: "Peanut Butter Cookie", price: 4.00 },
@@ -16,26 +15,19 @@
       cinnamon: { name: "Cinnamon Roll", price: 5.00 }
     };
 
-    // Get the item ID from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const itemId = urlParams.get("item");
 
     if (itemId && products[itemId]) {
-      // Load cart from localStorage or create a new one
       let cart = JSON.parse(localStorage.getItem("cart")) || {};
-      
-      // Add the item (or increase quantity)
       cart[itemId] = (cart[itemId] || 0) + 1;
-      
-      // Save cart back to localStorage
       localStorage.setItem("cart", JSON.stringify(cart));
-      
       alert(`${products[itemId].name} added to your cart!`);
     } else {
       alert("Item not recognized.");
     }
 
-    // Redirect to the main cart page (index.html)
+    // Redirect to cart page
     window.location.href = "index.html";
   </script>
 </body>
