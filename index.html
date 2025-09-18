@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bake Stand Checkout</title>
-  <script src="https://www.paypal.com/sdk/js?client-id=AUtz5g0rXfzkC0Cm-BO6apdAQPS48g3esnVC9Ww3og9p9LVW4GJLmqVZULAlh3_Ie6t8v43XneAOpyxn&currency=USD"></script>
+  <meta charset="UTF-8">
+  <title>Little Peach Oven Cart</title>
+  <!-- Replace YOUR_CLIENT_ID with your PayPal client ID -->
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"></script>
 </head>
 <body>
   <h1>Your Cart</h1>
@@ -12,18 +14,18 @@
   <div id="paypal-button-container"></div>
 
   <script>
-    // Example products
+    // Products
     const products = {
-      Chocolate: { name: "Chocolate Chip Cookie", price: 4.00 },
-      PeautButter: { name: "Peanut Butter Cookie", price: 4.00 },
-      Oatmeal: { name: "Oatmeal CreamPie", price: 4.00 },
-      Cinnamon: { name: "Cinnamon Roll", price: 5.00 }
+      chocolate: { name: "Chocolate Chip Cookie", price: 4.00 },
+      peanutbutter: { name: "Peanut Butter Cookie", price: 4.00 },
+      oatmeal: { name: "Oatmeal CreamPie", price: 4.00 },
+      cinnamon: { name: "Cinnamon Roll", price: 5.00 }
     };
 
-    // Cart persistence
+    // Load cart from localStorage
     let cart = JSON.parse(localStorage.getItem("cart")) || {};
 
-    // Display cart
+    // Render cart items
     function renderCart() {
       const cartList = document.getElementById("cart-items");
       cartList.innerHTML = "";
@@ -32,15 +34,18 @@
       for (let id in cart) {
         const item = products[id];
         const qty = cart[id];
-        total += item.price * qty;
-        cartList.innerHTML += `<li>${item.name} x ${qty} = $${(item.price * qty).toFixed(2)}</li>`;
+        const subtotal = item.price * qty;
+        total += subtotal;
+        cartList.innerHTML += `<li>${item.name} x ${qty} = $${subtotal.toFixed(2)}</li>`;
       }
 
       document.getElementById("total").textContent = total.toFixed(2);
-      return total;
+      return total.toFixed(2);
     }
 
-    // PayPal button
+    renderCart();
+
+    // PayPal Button
     paypal.Buttons({
       createOrder: function(data, actions) {
         const items = [];
@@ -67,16 +72,14 @@
       },
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
-          alert("Thanks " + details.payer.name.given_name + "! Your payment is complete.");
-          cart = {}; // clear cart
+          alert("Thank you, " + details.payer.name.given_name + "! Your payment is complete.");
+          // Clear cart
+          cart = {};
           localStorage.removeItem("cart");
           renderCart();
         });
       }
     }).render('#paypal-button-container');
-
-    // Initial render
-    renderCart();
   </script>
 </body>
 </html>
