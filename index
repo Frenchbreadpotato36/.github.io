@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Little Peach Oven Cart</title>
   <!-- Replace YOUR_CLIENT_ID with your PayPal client ID -->
-  <script src="https://www.paypal.com/sdk/js?client-id=AUtz5g0rXfzkC0Cm-BO6apdAQPS48g3esnVC9Ww3og9p9LVW4GJLmqVZULAlh3_Ie6t8v43XneAOpyxn&currency=USD"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"></script>
 </head>
 <body>
   <h1>Your Cart</h1>
@@ -14,7 +14,6 @@
   <div id="paypal-button-container"></div>
 
   <script>
-    // Products
     const products = {
       chocolate: { name: "Chocolate Chip Cookie", price: 4.00 },
       peanutbutter: { name: "Peanut Butter Cookie", price: 4.00 },
@@ -22,10 +21,8 @@
       cinnamon: { name: "Cinnamon Roll", price: 5.00 }
     };
 
-    // Load cart from localStorage
     let cart = JSON.parse(localStorage.getItem("cart")) || {};
 
-    // Render cart items
     function renderCart() {
       const cartList = document.getElementById("cart-items");
       cartList.innerHTML = "";
@@ -45,7 +42,6 @@
 
     renderCart();
 
-    // PayPal Button
     paypal.Buttons({
       createOrder: function(data, actions) {
         const items = [];
@@ -62,9 +58,7 @@
             amount: {
               currency_code: "USD",
               value: renderCart(),
-              breakdown: {
-                item_total: { currency_code: "USD", value: renderCart() }
-              }
+              breakdown: { item_total: { currency_code: "USD", value: renderCart() } }
             },
             items: items
           }]
@@ -72,8 +66,7 @@
       },
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
-          alert("Thank you, " + details.payer.name.given_name + "! Your payment is complete.");
-          // Clear cart
+          alert("Thanks " + details.payer.name.given_name + "! Your payment is complete.");
           cart = {};
           localStorage.removeItem("cart");
           renderCart();
