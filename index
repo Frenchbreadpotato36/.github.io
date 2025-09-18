@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Little Peach Oven Cart</title>
+  <!-- Replace YOUR_CLIENT_ID with your PayPal client ID -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AUtz5g0rXfzkC0Cm-BO6apdAQPS48g3esnVC9Ww3og9p9LVW4GJLmqVZULAlh3_Ie6t8v43XneAOpyxn&currency=USD"></script>
+</head>
+<body>
+  <h1>Your Cart</h1>
+  <ul id="cart-items"></ul>
+  <p>Total: $<span id="total">0.00</span></p>
+
+  <div id="paypal-button-container"></div>
+
+  <script>
+    // Products
+    const products = {
+      chocolate: { name: "Chocolate Chip Cookie", price: 4.00 },
+      peanutbutter: { name: "Peanut Butter Cookie", price: 4.00 },
+      oatmeal: { name: "Oatmeal CreamPie", price: 4.00 },
+      cinnamon: { name: "Cinnamon Roll", price: 5.00 }
+    };
+
+    // Load cart from localStorage
+    let cart = JSON.parse(localStorage.getItem("cart")) || {};
+
+    // Render cart items
+    function renderCart() {
+      const cartList = document.getElementById("cart-items");
+      cartList.innerHTML = "";
+      let total = 0;
+
+      for (let id in cart) {
+        const item = products[id];
+        const qty = cart[id];
+        const subtotal = item.price * qty;
+        total += subtotal;
+        cartList.innerHTML += `<li>${item.name} x ${qty} = $${subtotal.toFixed(2)}</li>`;
+      }
+
+      document.getElementById("total").textContent = total.toFixed(2);
+      return total.toFixed(2);
+    }
+
+    renderCart();
+
+    // PayPal Button
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        const items = [];
+        for (let id in cart) {
+          items.push({
+            name: products[id].name,
+            unit_amount: { currency_code: "USD", value: products[id].price },
+            quantity: cart[id]
+          });
+        }
+
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              currency_code: "USD",
+              value: renderCart(),
+              breakdown: {
+                item_total: { currency_code: "USD", value: renderCart() }
+              }
+            },
+            items: items
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          alert("Thank you, " + details.payer.name.given_name + "! Your payment is complete.");
+          // Clear cart
+          cart = {};
+          localStorage.removeItem("cart");
+          renderCart();
+        });
+      }
+    }).render('#paypal-button-container');
+  </script>
+</body>
+</html>
